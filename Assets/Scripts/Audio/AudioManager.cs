@@ -39,22 +39,28 @@ namespace ShadowFire.Audio
             _2dSource.playOnAwake = false;
 
             GenerateCachedClips();
+
+            // Ensure Dynamic Music System
+            if (GetComponent<DynamicMusicSystem>() == null)
+            {
+                gameObject.AddComponent<DynamicMusicSystem>();
+            }
         }
 
         private void GenerateCachedClips()
         {
-            _gunshotClips[WeaponType.Rifle] = ProceduralAudioGenerator.GenerateGunshot(WeaponType.Rifle);
-            _gunshotClips[WeaponType.SMG] = ProceduralAudioGenerator.GenerateGunshot(WeaponType.SMG);
-            _gunshotClips[WeaponType.Sniper] = ProceduralAudioGenerator.GenerateGunshot(WeaponType.Sniper);
-            _gunshotClips[WeaponType.Shotgun] = ProceduralAudioGenerator.GenerateGunshot(WeaponType.Shotgun);
-            _gunshotClips[WeaponType.RocketLauncher] = ProceduralAudioGenerator.GenerateGunshot(WeaponType.RocketLauncher);
+            _gunshotClips[WeaponType.Rifle] = MultiLayerSoundSynthesizer.GenerateLayeredGunshot(WeaponType.Rifle);
+            _gunshotClips[WeaponType.SMG] = MultiLayerSoundSynthesizer.GenerateLayeredGunshot(WeaponType.SMG);
+            _gunshotClips[WeaponType.Sniper] = MultiLayerSoundSynthesizer.GenerateLayeredGunshot(WeaponType.Sniper);
+            _gunshotClips[WeaponType.Shotgun] = MultiLayerSoundSynthesizer.GenerateLayeredGunshot(WeaponType.Shotgun);
+            _gunshotClips[WeaponType.RocketLauncher] = MultiLayerSoundSynthesizer.GenerateLayeredGunshot(WeaponType.RocketLauncher);
 
-            _explosionClip = ProceduralAudioGenerator.GenerateExplosion();
+            _explosionClip = MultiLayerSoundSynthesizer.GenerateLayeredExplosion();
             _reloadClip = ProceduralAudioGenerator.GenerateReload();
             _footstepClip = ProceduralAudioGenerator.GenerateFootstep();
             _pickupClip = ProceduralAudioGenerator.GeneratePickup();
             _levelUpClip = ProceduralAudioGenerator.GenerateLevelUp();
-            _bossRoarClip = ProceduralAudioGenerator.GenerateBossRoar();
+            _bossRoarClip = MultiLayerSoundSynthesizer.GenerateTitanRoar();
             _tickClip = ProceduralAudioGenerator.GenerateTick();
         }
 

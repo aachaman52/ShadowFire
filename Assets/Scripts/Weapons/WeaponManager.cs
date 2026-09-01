@@ -73,8 +73,8 @@ namespace ShadowFire.Weapons
                 weaponObj.transform.localPosition = Vector3.zero;
                 weaponObj.transform.localRotation = Quaternion.identity;
 
-                // Procedural weapon visual representation
-                BuildWeaponVisualMesh(weaponObj, data);
+                // Build precision multi-part 3D weapon model & animation controller
+                var animController = ShadowFire.Models.DetailedWeaponMeshBuilder.BuildWeaponModel(weaponObj, data);
 
                 Weapon weapon = weaponObj.AddComponent<Weapon>();
                 weapon.Initialize(data, playerCamera);
@@ -87,42 +87,6 @@ namespace ShadowFire.Weapons
             {
                 SelectWeapon(0);
             }
-        }
-
-        private void BuildWeaponVisualMesh(GameObject root, WeaponDataSO data)
-        {
-            // Gun Barrel / Body
-            GameObject body = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            body.name = "Model_Body";
-            body.transform.SetParent(root.transform, false);
-            
-            // Adjust proportions based on weapon type
-            switch (data.WeaponType)
-            {
-                case WeaponType.Rifle:
-                    body.transform.localScale = new Vector3(0.06f, 0.10f, 0.55f);
-                    break;
-                case WeaponType.SMG:
-                    body.transform.localScale = new Vector3(0.05f, 0.09f, 0.35f);
-                    break;
-                case WeaponType.Sniper:
-                    body.transform.localScale = new Vector3(0.06f, 0.11f, 0.85f);
-                    break;
-                case WeaponType.Shotgun:
-                    body.transform.localScale = new Vector3(0.08f, 0.12f, 0.50f);
-                    break;
-                case WeaponType.RocketLauncher:
-                    body.transform.localScale = new Vector3(0.12f, 0.14f, 0.70f);
-                    break;
-            }
-
-            Destroy(body.GetComponent<Collider>());
-            var mr = body.GetComponent<MeshRenderer>();
-            Material mat = new Material(Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard"));
-            mat.color = data.WeaponColor;
-            if (mat.HasProperty("_Metallic")) mat.SetFloat("_Metallic", 0.8f);
-            if (mat.HasProperty("_Smoothness")) mat.SetFloat("_Smoothness", 0.6f);
-            mr.material = mat;
         }
 
         private void Update()

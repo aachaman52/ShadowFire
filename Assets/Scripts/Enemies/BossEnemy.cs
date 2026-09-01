@@ -117,6 +117,11 @@ namespace ShadowFire.Enemies
 
         private void ExecuteGroundSlam()
         {
+            if (characterAnimator != null)
+            {
+                characterAnimator.TriggerAttack(1, 1.2f);
+            }
+
             if (AudioManager.Instance != null) AudioManager.Instance.PlayExplosion(transform.position);
             if (CameraShake.Instance != null) CameraShake.Instance.AddTrauma(0.9f);
             if (VFXManager.Instance != null) VFXManager.Instance.SpawnExplosion(transform.position, 2.0f);
@@ -136,6 +141,11 @@ namespace ShadowFire.Enemies
         private IEnumerator ChargeAttackRoutine()
         {
             if (targetPlayer == null) yield break;
+
+            if (characterAnimator != null)
+            {
+                characterAnimator.TriggerAttack(0, 1.0f);
+            }
 
             Vector3 chargeDir = (targetPlayer.position - transform.position).normalized;
             chargeDir.y = 0;
@@ -174,6 +184,11 @@ namespace ShadowFire.Enemies
         private void ExecuteProjectileBarrage()
         {
             if (targetPlayer == null) return;
+
+            if (characterAnimator != null)
+            {
+                characterAnimator.TriggerAttack(2, 0.8f);
+            }
 
             Vector3 spawnOrigin = transform.position + Vector3.up * 2.5f;
             Vector3 baseDir = (targetPlayer.position - spawnOrigin).normalized;

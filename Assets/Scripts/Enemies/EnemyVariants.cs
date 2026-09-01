@@ -85,6 +85,11 @@ namespace ShadowFire.Enemies
         {
             lastAttackTime = Time.time;
 
+            if (characterAnimator != null)
+            {
+                characterAnimator.TriggerAttack(1, 0.8f);
+            }
+
             if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.PlayExplosion(transform.position);
@@ -184,6 +189,11 @@ namespace ShadowFire.Enemies
         protected override void PerformAttack()
         {
             lastAttackTime = Time.time;
+
+            if (characterAnimator != null)
+            {
+                characterAnimator.TriggerAttack(2, 0.4f);
+            }
 
             if (targetPlayer == null) return;
 

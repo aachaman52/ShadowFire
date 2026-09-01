@@ -86,6 +86,12 @@ namespace ShadowFire.Managers
             OnScoreChanged?.Invoke(totalScore);
         }
 
+        public void AddScore(int amount)
+        {
+            totalScore += amount;
+            OnScoreChanged?.Invoke(totalScore);
+        }
+
         public void AddWaveBonus(int waveNum)
         {
             highestWaveReached = Mathf.Max(highestWaveReached, waveNum);

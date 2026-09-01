@@ -29,7 +29,7 @@ namespace ShadowFire.Bootstrap
 
         public void BootstrapGame()
         {
-            Debug.Log("[ShadowFire] Initializing ShadowFire Survival Game Engine...");
+            Debug.Log("[ShadowFire] Initializing ShadowFire Survival Game Engine with 4 Pillars...");
 
             // 1. Core Singletons & Managers
             EnsureSingleton<GameManager>("GameManager");
@@ -40,20 +40,28 @@ namespace ShadowFire.Bootstrap
             EnsureSingleton<UpgradeManager>("UpgradeManager");
             WaveManager waveManager = EnsureSingleton<WaveManager>("WaveManager");
 
-            // 2. Build 3D Arena
+            // 2. Map & Mode Managers
+            ShadowFire.Maps.MapManager mapManager = EnsureSingleton<ShadowFire.Maps.MapManager>("MapManager");
+            ShadowFire.Modes.ModeManager modeManager = EnsureSingleton<ShadowFire.Modes.ModeManager>("ModeManager");
+
+            // 3. Build 3D Arena
             GameObject arenaObj = new GameObject("Environment_Arena");
             ArenaBuilder arena = arenaObj.AddComponent<ArenaBuilder>();
             arena.BuildArena();
             waveManager.Arena = arena;
 
-            // 3. NavMesh Surface Baker
+            // 4. NavMesh Surface Baker
             NavMeshRuntimeBaker navBaker = arenaObj.AddComponent<NavMeshRuntimeBaker>();
             navBaker.BakeNavMesh();
 
-            // 4. Build Player
+            // 5. Initialize Default Map & Game Mode
+            mapManager.LoadMap(ShadowFire.Maps.MapTheme.OutpostRuin);
+            modeManager.SetGameMode(ShadowFire.Modes.GameModeType.Survival);
+
+            // 6. Build Player
             GameObject playerObj = BuildPlayer(arena.PlayerSpawnPoint != null ? arena.PlayerSpawnPoint.position : new Vector3(0, 3.5f, 0));
 
-            // 5. Build Complete UI Canvas & HUD
+            // 7. Build Complete UI Canvas & HUD
             BuildGameUI(playerObj);
 
             Debug.Log("[ShadowFire] Bootstrap complete. Entering Wave 1.");
@@ -124,11 +132,15 @@ namespace ShadowFire.Bootstrap
 
             // HUD Controller
             HUDController hud = canvasObj.AddComponent<HUDController>();
+            MapAndModeSelectUI mapModeUI = canvasObj.AddComponent<MapAndModeSelectUI>();
 
             // 1. Top Wave & Enemy Counter Banner
-            GameObject waveBanner = CreateUIPanel(canvasObj.transform, "WaveBanner", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0, -40), new Vector2(400, 70));
-            hud.WaveText = CreateUIText(waveBanner.transform, "WAVE 1", 28, TextAlignmentOptions.Center, Color.white, new Vector2(0, 12), new Vector2(380, 35));
-            hud.EnemiesRemainingText = CreateUIText(waveBanner.transform, "ENEMIES: 0", 18, TextAlignmentOptions.Center, new Color(1f, 0.4f, 0.4f), new Vector2(0, -16), new Vector2(380, 25));
+            GameObject waveBanner = CreateUIPanel(canvasObj.transform, "WaveBanner", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0, -40), new Vector2(500, 80));
+            hud.WaveText = CreateUIText(waveBanner.transform, "WAVE 1", 28, TextAlignmentOptions.Center, Color.white, new Vector2(0, 18), new Vector2(480, 35));
+            hud.EnemiesRemainingText = CreateUIText(waveBanner.transform, "ENEMIES: 0", 18, TextAlignmentOptions.Center, new Color(1f, 0.4f, 0.4f), new Vector2(0, -12), new Vector2(480, 25));
+
+            // Objective Text
+            mapModeUI.ObjectiveText = CreateUIText(canvasObj.transform, "OBJECTIVE: SURVIVE", 18, TextAlignmentOptions.Center, new Color(0.3f, 0.9f, 1f), new Vector2(0, -90), new Vector2(600, 30), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
 
             hud.ScoreText = CreateUIText(canvasObj.transform, "SCORE: 0", 20, TextAlignmentOptions.TopRight, new Color(1f, 0.85f, 0.2f), new Vector2(-120, -35), new Vector2(220, 35), new Vector2(1, 1), new Vector2(1, 1));
             hud.CountdownText = CreateUIText(canvasObj.transform, "", 36, TextAlignmentOptions.Center, new Color(1f, 0.9f, 0.2f), new Vector2(0, 180), new Vector2(600, 60), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));

@@ -31,6 +31,7 @@ namespace ShadowFire.Enemies
         [Header("Visual Feedback")]
         [SerializeField] protected MeshRenderer bodyRenderer;
         protected Color originalBodyColor;
+        protected ProceduralCharacterAnimator characterAnimator;
 
         protected NavMeshAgent agent;
         protected Transform targetPlayer;
@@ -44,6 +45,7 @@ namespace ShadowFire.Enemies
         public bool IsAlive => !isDead && currentHealth > 0;
         public EnemyState State => currentState;
         public NavMeshAgent Agent => agent;
+        public ProceduralCharacterAnimator Animator => characterAnimator;
 
         public event Action<DamageInfo> OnDamaged;
         public event Action<DamageInfo> OnDied;
@@ -51,6 +53,7 @@ namespace ShadowFire.Enemies
         protected virtual void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
+            characterAnimator = GetComponent<ProceduralCharacterAnimator>();
             if (bodyRenderer == null) bodyRenderer = GetComponentInChildren<MeshRenderer>();
             if (bodyRenderer != null && bodyRenderer.material != null)
             {
@@ -65,6 +68,11 @@ namespace ShadowFire.Enemies
             moveSpeed *= speedMultiplier;
             attackDamage *= damageMultiplier;
             isDead = false;
+
+            if (characterAnimator == null)
+            {
+                characterAnimator = CharacterModelBuilder.BuildHumanoidModel(gameObject, Type, Type == EnemyType.Boss ? 2.5f : (Type == EnemyType.Tank ? 1.6f : 1.0f));
+            }
 
             if (agent != null)
             {
@@ -88,6 +96,11 @@ namespace ShadowFire.Enemies
             if (targetPlayer == null && PlayerController.Instance != null)
             {
                 targetPlayer = PlayerController.Instance.transform;
+            }
+
+            if (characterAnimator != null && agent != null)
+            {
+                characterAnimator.SetSpeed(agent.velocity.magnitude);
             }
 
             UpdateStateMachine();
@@ -153,6 +166,11 @@ namespace ShadowFire.Enemies
         {
             lastAttackTime = Time.time;
 
+            if (characterAnimator != null)
+            {
+                characterAnimator.TriggerAttack(0, attackCooldown * 0.7f);
+            }
+
             if (targetPlayer != null && Vector3.Distance(transform.position, targetPlayer.position) <= attackRange * 1.3f)
             {
                 IDamageable playerDamageable = targetPlayer.GetComponent<IDamageable>();
@@ -177,8 +195,12 @@ namespace ShadowFire.Enemies
                 DamageNumberManager.Instance.ShowDamageNumber(damageInfo.Amount, transform.position + Vector3.up * 1.8f, damageInfo.IsCritical);
             }
 
-            // Trigger additive visual flinch flash without freezing AI state machine
+            // Trigger additive visual flinch flash and procedural skeleton flinch
             TriggerFlinchFlash();
+            if (characterAnimator != null)
+            {
+                characterAnimator.TriggerFlinch(damageInfo.KnockbackForce);
+            }
 
             // Apply knockback
             if (damageInfo.KnockbackForce.sqrMagnitude > 0.1f)
@@ -233,6 +255,11 @@ namespace ShadowFire.Enemies
             {
                 agent.isStopped = true;
                 agent.enabled = false;
+            }
+
+            if (characterAnimator != null)
+            {
+                characterAnimator.TriggerDeath();
             }
 
             OnDied?.Invoke(damageInfo);

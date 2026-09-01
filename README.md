@@ -6,13 +6,13 @@ A 3D wave-based FPS survival game developed under **Aachman Studios**.
 
 ## Overview
 
-**ShadowFire** is a high-intensity 3D first-person survival shooter built with Unity's Universal Render Pipeline (URP). Players must endure endless scaling enemy hordes in a fortified industrial arena, level up to acquire game-changing upgrades, wield a modular five-weapon arsenal, and defeat multi-phase boss titans.
+**ShadowFire** is a production-quality 3D first-person survival shooter built with Unity's Universal Render Pipeline (URP). Players survive endless scaling enemy hordes in multiple thematic environments, acquire game-changing deck upgrades, wield a modular multi-part 3D arsenal with mechanical recoil and reload animations, and eliminate multi-phase boss titans.
 
 ---
 
-## Unity Version
+## Unity Version & Architecture
 
-* **Unity 6.2 LTS** (Universal Render Pipeline)
+* **Engine**: Unity 6.2 LTS (Universal Render Pipeline)
 * **Scripting Runtime**: C# (.NET Standard 2.1 / Unity 6)
 * **Input**: Unity New Input System (with legacy input fallback)
 * **AI & Navigation**: Unity AI Navigation (NavMesh)
@@ -20,64 +20,66 @@ A 3D wave-based FPS survival game developed under **Aachman Studios**.
 
 ---
 
-## Main Gameplay Features
+## 4 Core Pillars
 
-* **Responsive 6-DOF Player Controller**: WASD movement, sprint with stamina drain & regeneration, smooth crouch height interpolation, jumping physics, mouse look with sensitivity adjustment, dynamic head bobbing, and gait-synced footstep audio.
-* **Modular Combat System**: Comprehensive weapon framework handling hitscan raycasting, bullet penetration, multi-pellet spread cones, physics projectiles with explosive splash damage, recoil recovery, procedural sway, muzzle flashes, and bullet tracers.
-* **Intelligent NavMesh AI**: State machine-driven enemy AI (Idle, Chase, Attack, Dead) with additive non-blocking flinch feedback.
-* **Dynamic Visual & Audio Polish**: Trauma-based camera shake, dynamic crosshair spread bloom, hitmarkers (with kill confirmation pulse), 3D floating damage numbers, screen damage flashes, and low-health vignette heartbeat.
-* **Persistent Save System**: JSON save storage tracking High Score, Highest Wave, Total Kills, and custom player settings.
+### 1. Articulated Characters & Procedural Skeletal Animation
+* **Procedural Humanoid Rig**: Multi-joint skeletal hierarchy (`ProceduralCharacterAnimator.cs` & `CharacterModelBuilder.cs`) driving Pelvis, Spine, Chest, Head, Shoulders, Upper Arms, Forearms, Hands, Thighs, Shins, and Feet.
+* **Locomotion & Combat States**:
+  * Realtime joint rotation driving breathing, walk/run stride cycling, spine lean, and head bobbing.
+  * Melee double-swipe attacks, leaping lunges, two-handed overhead ground smashes, and spitter bio-recoil.
+  * Dynamic impact flinches and physics-inspired collapse death sequences.
+
+### 2. High-Detail 3D Weapons & Dynamic Mechanical Animations
+* **Modular Multi-Part 3D Models** (`DetailedWeaponMeshBuilder.cs`):
+  * **Assault Rifle**: Receiver, picatinny top rail, fluted barrel, muzzle compensator, tactical stock, pistol grip, holographic sight with glowing center reticle, and removable curved magazine.
+  * **Viper SMG**: Compact submachine frame, vertical foregrip, threaded suppressor shroud, wire stock, reflex sight, and extended 45-round stick magazine.
+  * **Apex Sniper**: Heavy chassis, long fluted barrel, high-caliber muzzle brake, precision stock with cheek rest, dual-lens illuminated telescopic scope, foldable bipod, and animated bolt handle.
+  * **Breaker Shotgun**: Heavy ribbed barrel, under-barrel tubular magazine, grooved pump slide, top heat shield, and tactical grip.
+  * **Havoc Rocket Launcher**: Quad-vented exhaust tube, dual firing handles, targeting computer display with glowing HUD screen, and loaded rocket warhead with aerodynamic fins.
+* **Mechanical Combat Animations** (`WeaponAnimationController.cs`):
+  * Dynamic viewmodel recoil kickback and rotation recovery.
+  * Slide blowback on Rifle/SMG, bolt-action cycling sequence on Sniper (lift $\rightarrow$ pull back $\rightarrow$ push forward $\rightarrow$ lock down), pump slide racking on Shotgun, and magazine drop/snap-in reload sequences.
+
+### 3. Multi-Layered Sound Design & Dynamic Adaptive Music Engine
+* **Multi-Layer Acoustic Synthesis** (`MultiLayerSoundSynthesizer.cs`):
+  * Gunshots generated with high-frequency transient snaps, low-mid acoustic punch, mechanical slide clanking, and spatial reverb tails.
+  * Explosions with sub-bass rumbles, blast noise, and shockwave roars.
+  * Titan demonic roars and organic impact audio.
+* **Dynamic Adaptive Soundtrack** (`DynamicMusicSystem.cs`):
+  * **Ambient Tension**: Dark atmospheric synth pad and suspense pulses during countdowns.
+  * **Horde Wave Combat**: 130 BPM arpeggiated synthwave with 4-on-the-floor kick, rolling 16th-note bassline, and lead synths during active waves.
+  * **Boss Battle Theme**: 150 BPM industrial darksynth with heavy sub-bass drops, industrial snares, and sirens with Enrage pitch shifts.
+
+### 4. Multi-Map System & 3 Game Modes
+* **3 Maps** (`MapDataSO.cs`, `MapBuilders.cs`, `MapManager.cs`):
+  1. **Outpost Ruin**: Fortified industrial night fortress with upper catwalks, ramps, searchlights, and defensive barricades.
+  2. **Toxic Biolab**: Subterranean research laboratory with glowing acid hazard pools, containment pods, and overhead metal catwalks.
+  3. **Inferno Crater**: Volcanic caldera with glowing magma rifts, ancient obsidian obelisks, and molten ash atmosphere.
+* **3 Game Modes** (`GameModes.cs`, `ModeManager.cs`):
+  1. **Endless Survival**: Endless scaling waves with boss titans every 5 waves.
+  2. **Extraction Protocol**: Survive to Wave 10 $\rightarrow$ activate extraction beacon $\rightarrow$ defend landing zone under intense horde assault $\rightarrow$ evac victory!
+  3. **Boss Titan Rush**: Sequential titan boss battles with accelerated upgrade drafts after every victory.
 
 ---
 
-## Weapons
+## Upgrade Deck (10 Cards)
 
-1. **Assault Rifle**: Automatic kinetic rifle with steady recoil, high reliability, and balanced damage.
-2. **Viper SMG**: Rapid-fire machine pistol tailored for high-volume close-range swarms.
-3. **Apex Sniper**: Heavy caliber bolt-action rifle featuring scoped zoom FOV and high penetration (pierces up to 4 enemies).
-4. **Breaker Shotgun**: 8-pellet cone spread weapon dealing heavy close-range damage and kinetic knockback.
-5. **Havoc Rocket Launcher**: Heavy projectile launcher firing explosive rockets with 7.5m radius splash damage and physics impulse.
-
----
-
-## Enemy Types
-
-* **Zombie**: Standard swarming melee infantry.
-* **Shadow Runner**: Agile, high-speed flanker with lunging leap attacks.
-* **Goliath Tank**: Armored juggernaut with massive health, ground stomp shockwaves, and 90% knockback resistance.
-* **Shadow Spitter**: Tactical ranged combatant that maintains standoff distance while firing projectile bursts.
-* **Shadow Overlord (Boss)**: Colossal boss encountering players every 5 waves with charge attacks, 360° ground slams, homing barrage attacks, and an **Enrage Phase** (<30% HP) with increased speed and attack rates.
-
----
-
-## Wave System
-
-* Waves progressively increase in enemy count, enemy health, and movement speed.
-* Every 5th wave (Wave 5, 10, 15...) triggers a dedicated **Boss Encounter** accompanied by minion escorts.
-* 5-second tactical countdown between waves with audio countdown cues.
-
----
-
-## Upgrade System
-
-* Enemies drop XP gems that fill the player's XP bar.
-* Leveling up pauses the game and presents 3 randomized upgrade cards from a 10-card deck:
-  1. **Heavy Caliber**: +20% Damage
-  2. **Quick Mags**: +25% Faster Reload Speed
-  3. **Drum Magazine**: +30% Magazine Capacity
-  4. **Adrenaline Rush**: +20% Sprint Speed
-  5. **Vitality Matrix**: +25 Max HP & instant heal
-  6. **Titanium Plates**: +15 Armor (damage reduction)
-  7. **Hollow Point**: +15% Critical Hit Chance
-  8. **Overclock Firing**: +20% Fire Rate
-  9. **Shock Shells**: Explosive kinetic rounds
-  10. **Vampiric Leech**: +10% Lifesteal
+1. **Heavy Caliber**: +20% Damage
+2. **Quick Mags**: +25% Faster Reload Speed
+3. **Drum Magazine**: +30% Magazine Capacity
+4. **Adrenaline Rush**: +20% Sprint Speed
+5. **Vitality Matrix**: +25 Max HP & instant 25 HP heal
+6. **Titanium Plates**: +15 Armor (damage reduction)
+7. **Hollow Point**: +15% Critical Hit Chance (x2 Damage)
+8. **Overclock Firing**: +20% Fire Rate
+9. **Shock Shells**: Explosive kinetic bullet impacts
+10. **Vampiric Leech**: 10% of damage dealt converted to HP
 
 ---
 
 ## Controls
 
-| Action | Input |
+| Action | Key / Input |
 |---|---|
 | Move | `W` `A` `S` `D` |
 | Look | `Mouse Movement` |
@@ -92,27 +94,10 @@ A 3D wave-based FPS survival game developed under **Aachman Studios**.
 
 ---
 
-## How to Open the Project
+## How to Open & Play
 
 1. Open **Unity Hub**.
-2. Click **Add** -> **Add project from disk**.
-3. Select the repository root folder (`temp1`).
-4. Ensure the editor version is set to **Unity 6.2 LTS** (or compatible Unity 6).
-5. Open the project.
-
----
-
-## How to Play
-
-1. In the Unity Project window, navigate to `Assets/Scenes/`.
-2. Open `ShadowFireArena.unity`.
-3. Click the **Play** button (▶) in the Unity Editor toolbar.
-4. Survive waves, pick up loot, level up upgrades, and eliminate the Shadow Overlord!
-
----
-
-## Current Development Status
-
-* **Status**: Complete Playable Core Engine & Prototype.
-* **Architecture**: Fully modular, zero missing serialized references, zero placeholder assets.
-* **Ready for expansion**: Content packs, new arenas, and multiplayer networking can build directly on top of the established `IDamageable`, `Weapon`, and `EnemyBase` abstractions.
+2. Click **Add** $\rightarrow$ **Add project from disk**.
+3. Select this folder (`temp1`).
+4. Open `Assets/Scenes/ShadowFireArena.unity`.
+5. Press **Play** (▶) in the Unity Editor to enter the arena!

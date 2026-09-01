@@ -41,17 +41,21 @@ namespace ShadowFire.Weapons
         public event Action OnReloadStarted;
         public event Action OnReloadFinished;
 
+        private WeaponAnimationController _animController;
+
         private void Awake()
         {
             if (weaponModelTransform == null) weaponModelTransform = transform;
             _modelInitialLocalPos = weaponModelTransform.localPosition;
             _modelInitialLocalRot = weaponModelTransform.localRotation;
+            _animController = GetComponent<WeaponAnimationController>();
         }
 
         public void Initialize(WeaponDataSO data, Camera playerCam)
         {
             weaponData = data;
             _playerCamera = playerCam;
+            _animController = GetComponent<WeaponAnimationController>();
             if (weaponData != null)
             {
                 currentAmmo = MaxMagazine;
@@ -95,6 +99,11 @@ namespace ShadowFire.Weapons
 
             ExecuteFire();
             ApplyRecoil();
+
+            if (_animController != null)
+            {
+                _animController.OnFired();
+            }
 
             if (AudioManager.Instance != null)
             {
@@ -226,12 +235,18 @@ namespace ShadowFire.Weapons
             isReloading = true;
             OnReloadStarted?.Invoke();
 
+            float reloadDuration = weaponData.ReloadTime * (PlayerStats.Instance != null ? PlayerStats.Instance.ReloadSpeedMultiplier : 1f);
+
+            if (_animController != null)
+            {
+                _animController.OnReloadStarted(reloadDuration);
+            }
+
             if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.PlayReload();
             }
 
-            float reloadDuration = weaponData.ReloadTime * (PlayerStats.Instance != null ? PlayerStats.Instance.ReloadSpeedMultiplier : 1f);
             yield return new WaitForSeconds(reloadDuration);
 
             int maxMag = MaxMagazine;
