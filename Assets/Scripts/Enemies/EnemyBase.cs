@@ -7,6 +7,8 @@ using ShadowFire.Player;
 using ShadowFire.Audio;
 using ShadowFire.Effects;
 using ShadowFire.Managers;
+using ShadowFire.Animation;
+using ShadowFire.Models;
 
 namespace ShadowFire.Enemies
 {

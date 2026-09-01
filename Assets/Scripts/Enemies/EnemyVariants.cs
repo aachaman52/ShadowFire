@@ -2,6 +2,8 @@ using UnityEngine;
 using ShadowFire.Core;
 using ShadowFire.Audio;
 using ShadowFire.Effects;
+using ShadowFire.Animation;
+using ShadowFire.Models;
 
 namespace ShadowFire.Enemies
 {

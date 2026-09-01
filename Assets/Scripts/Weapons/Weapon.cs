@@ -5,6 +5,8 @@ using ShadowFire.Core;
 using ShadowFire.Player;
 using ShadowFire.Audio;
 using ShadowFire.Effects;
+using ShadowFire.Animation;
+using ShadowFire.Models;
 
 namespace ShadowFire.Weapons
 {
