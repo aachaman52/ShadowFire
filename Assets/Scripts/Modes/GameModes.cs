@@ -5,6 +5,7 @@ using ShadowFire.Core;
 using ShadowFire.Managers;
 using ShadowFire.Audio;
 using ShadowFire.Player;
+using ShadowFire.Effects;
 
 namespace ShadowFire.Modes
 {

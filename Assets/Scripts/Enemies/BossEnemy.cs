@@ -7,6 +7,7 @@ using ShadowFire.Effects;
 using ShadowFire.Weapons;
 using ShadowFire.Animation;
 using ShadowFire.Models;
+using ShadowFire.Managers;
 
 namespace ShadowFire.Enemies
 {
