@@ -164,7 +164,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100001}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00000000000000000000000000000000, type: 3}
+  m_Script: {fileID: 11500000, guid: 515c4e25182b74687c04a9818e244305, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ShadowFire.Bootstrap:GameBootstrapper
   autoBuildOnAwake: 1
