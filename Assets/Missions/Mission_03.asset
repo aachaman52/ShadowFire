@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f4f81e228b59914080879757cc699b8, type: 3}
+  m_Name: Mission_03
+  m_EditorClassIdentifier: 
+  MissionID: 3
+  MissionName: Research Facility
+  Description: Deep penetration into the bio-core. Survive escalating waves and eliminate
+    the Boss Titan.
+  SceneName: Level03
+  TotalWaves: 5
+  DifficultyMultiplier: 1.8
+  RequiredPlayerLevel: 1
+  RequiredPreviousMissionID: 0
+  BaseXpReward: 3500
+  CreditReward: 2200
+  CompletionBonus: 1000
+  HasBossFinalWave: 1
+  BossType: 4

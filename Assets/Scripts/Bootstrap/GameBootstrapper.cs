@@ -192,10 +192,10 @@ namespace ShadowFire.Bootstrap
             flashComp.BindImages(flashObj.GetComponent<Image>(), vignetteObj.GetComponent<Image>());
 
             // 7. Upgrade Modal UI
-            BuildUpgradeModalUI(canvasObj.transform);
+            BuildUpgradeModalUI(canvasObj);
 
             // 8. Settings, Pause & Game Over UI
-            BuildMenusUI(canvasObj.transform);
+            BuildMenusUI(canvasObj);
         }
 
         private void BuildCrosshairUI(Transform parent, HUDController hud)
@@ -234,15 +234,15 @@ namespace ShadowFire.Bootstrap
             return rt;
         }
 
-        private void BuildUpgradeModalUI(Transform parent)
+        private void BuildUpgradeModalUI(GameObject canvasObj)
         {
-            GameObject modal = CreateUIPanel(parent, "UpgradeModal", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(850, 480));
+            GameObject modal = CreateUIPanel(canvasObj.transform, "UpgradeModal", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(850, 480));
             Image bg = modal.GetComponent<Image>();
             bg.color = new Color(0.08f, 0.1f, 0.14f, 0.95f);
 
             CreateUIText(modal.transform, "LEVEL UP — CHOOSE UPGRADE", 26, TextAlignmentOptions.Center, new Color(1f, 0.85f, 0.2f), new Vector2(0, 190), new Vector2(800, 45));
 
-            UpgradeUIController upgradeUI = modal.AddComponent<UpgradeUIController>();
+            UpgradeUIController upgradeUI = canvasObj.AddComponent<UpgradeUIController>();
             upgradeUI.Container = modal;
             upgradeUI.CardButtons = new Button[3];
             upgradeUI.CardTitles = new TextMeshProUGUI[3];
@@ -267,14 +267,16 @@ namespace ShadowFire.Bootstrap
             modal.SetActive(false);
         }
 
-        private void BuildMenusUI(Transform parent)
+        private void BuildMenusUI(GameObject canvasObj)
         {
+            Transform parent = canvasObj.transform;
+
             // Settings Panel
             GameObject settingsPanel = CreateUIPanel(parent, "SettingsPanel", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(600, 500));
             settingsPanel.GetComponent<Image>().color = new Color(0.08f, 0.1f, 0.12f, 0.96f);
             CreateUIText(settingsPanel.transform, "SETTINGS", 28, TextAlignmentOptions.Center, Color.white, new Vector2(0, 200), new Vector2(500, 45));
 
-            SettingsUIController settingsUI = settingsPanel.AddComponent<SettingsUIController>();
+            SettingsUIController settingsUI = canvasObj.AddComponent<SettingsUIController>();
             settingsUI.SettingsPanel = settingsPanel;
 
             // Sensitivity Slider
@@ -312,7 +314,7 @@ namespace ShadowFire.Bootstrap
             pausePanel.GetComponent<Image>().color = new Color(0.08f, 0.1f, 0.12f, 0.95f);
             CreateUIText(pausePanel.transform, "GAME PAUSED", 28, TextAlignmentOptions.Center, Color.white, new Vector2(0, 140), new Vector2(400, 45));
 
-            PauseMenuController pauseUI = pausePanel.AddComponent<PauseMenuController>();
+            PauseMenuController pauseUI = canvasObj.AddComponent<PauseMenuController>();
             pauseUI.PausePanel = pausePanel;
 
             GameObject resumeBtnObj = CreateUIPanel(pausePanel.transform, "ResumeBtn", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, 50), new Vector2(280, 45));
@@ -336,7 +338,7 @@ namespace ShadowFire.Bootstrap
             goPanel.GetComponent<Image>().color = new Color(0.1f, 0.05f, 0.05f, 0.98f);
             CreateUIText(goPanel.transform, "SIGNAL LOST — DEFEAT", 30, TextAlignmentOptions.Center, new Color(1f, 0.2f, 0.2f), new Vector2(0, 210), new Vector2(550, 45));
 
-            GameOverUIController goUI = goPanel.AddComponent<GameOverUIController>();
+            GameOverUIController goUI = canvasObj.AddComponent<GameOverUIController>();
             goUI.GameOverPanel = goPanel;
 
             goUI.WavesSurvivedText = CreateUIText(goPanel.transform, "WAVES SURVIVED: 0", 20, TextAlignmentOptions.Center, Color.white, new Vector2(0, 130), new Vector2(500, 35));

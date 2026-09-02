@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ShadowFire.Core;
 using ShadowFire.Player;
+using ShadowFire.Managers;
 
 namespace ShadowFire.Weapons
 {
@@ -63,10 +64,22 @@ namespace ShadowFire.Weapons
                 weaponHolderTransform = holder.transform;
             }
 
+            var saveData = SaveSystem.SaveSystem.Load();
+
             for (int i = 0; i < dataList.Count; i++)
             {
-                WeaponDataSO data = dataList[i];
-                if (data == null) continue;
+                WeaponDataSO originalData = dataList[i];
+                if (originalData == null) continue;
+
+                WeaponDataSO data = ScriptableObject.Instantiate(originalData);
+                var wUpgrade = saveData.GetWeaponData(data.WeaponType);
+                if (wUpgrade != null)
+                {
+                    data.Damage *= (1.0f + wUpgrade.DamageLevel * 0.12f);
+                    data.FireRate *= (1.0f + wUpgrade.FireRateLevel * 0.08f);
+                    data.MagazineSize += (wUpgrade.MagazineLevel * 4);
+                    data.ReloadTime = Mathf.Max(0.5f, data.ReloadTime * Mathf.Max(0.4f, 1.0f - wUpgrade.ReloadLevel * 0.06f));
+                }
 
                 GameObject weaponObj = new GameObject($"Weapon_{data.WeaponName}");
                 weaponObj.transform.SetParent(weaponHolderTransform, false);
@@ -83,7 +96,12 @@ namespace ShadowFire.Weapons
                 weaponObj.SetActive(false);
             }
 
-            if (_weapons.Count > 0)
+            int primaryIdx = _weapons.FindIndex(w => w.Data.WeaponType == saveData.SelectedPrimaryWeapon);
+            if (primaryIdx >= 0)
+            {
+                SelectWeapon(primaryIdx);
+            }
+            else if (_weapons.Count > 0)
             {
                 SelectWeapon(0);
             }
@@ -91,6 +109,7 @@ namespace ShadowFire.Weapons
 
         private void Update()
         {
+            if (GameManager.Instance != null && GameManager.Instance.State != GameState.InGame && GameManager.Instance.State != GameState.WaveCountdown) return;
             HandleWeaponInput();
             HandleScopeZoom();
         }

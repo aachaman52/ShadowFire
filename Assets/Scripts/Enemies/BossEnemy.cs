@@ -8,6 +8,7 @@ using ShadowFire.Weapons;
 using ShadowFire.Animation;
 using ShadowFire.Models;
 using ShadowFire.Managers;
+using ShadowFire.Player;
 
 namespace ShadowFire.Enemies
 {
@@ -129,14 +130,13 @@ namespace ShadowFire.Enemies
             if (CameraShake.Instance != null) CameraShake.Instance.AddTrauma(0.9f);
             if (VFXManager.Instance != null) VFXManager.Instance.SpawnExplosion(transform.position, 2.0f);
 
-            Collider[] hits = Physics.OverlapSphere(transform.position, groundSlamRadius, LayerMask.GetMask("Player"));
-            foreach (var col in hits)
+            if (PlayerController.Instance != null)
             {
-                IDamageable damageable = col.GetComponent<IDamageable>();
-                if (damageable != null && damageable.IsAlive)
+                float dist = Vector3.Distance(transform.position, PlayerController.Instance.transform.position);
+                if (dist <= groundSlamRadius && PlayerStats.Instance != null && PlayerStats.Instance.IsAlive)
                 {
-                    DamageInfo dInfo = new DamageInfo(attackDamage * 1.2f, col.transform.position, Vector3.up, false, gameObject, (col.transform.position - transform.position).normalized * 22f, HitType.Explosive);
-                    damageable.TakeDamage(dInfo);
+                    DamageInfo dInfo = new DamageInfo(attackDamage * 1.2f, PlayerController.Instance.transform.position, Vector3.up, false, gameObject, (PlayerController.Instance.transform.position - transform.position).normalized * 22f, HitType.Explosive);
+                    PlayerStats.Instance.TakeDamage(dInfo);
                 }
             }
         }

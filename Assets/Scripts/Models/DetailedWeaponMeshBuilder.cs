@@ -184,7 +184,12 @@ namespace ShadowFire.Models
             obj.transform.localScale = localScale;
             if (localRot.HasValue) obj.transform.localRotation = Quaternion.Euler(localRot.Value);
 
-            Object.Destroy(obj.GetComponent<Collider>());
+            var col = obj.GetComponent<Collider>();
+            if (col != null)
+            {
+                if (Application.isPlaying) Object.Destroy(col);
+                else Object.DestroyImmediate(col);
+            }
             var mr = obj.GetComponent<MeshRenderer>();
             mr.material = mat;
 

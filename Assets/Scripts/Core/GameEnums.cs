@@ -7,7 +7,24 @@ namespace ShadowFire.Core
         WaveCountdown,
         UpgradePause,
         Paused,
-        GameOver
+        GameOver,
+        LevelComplete
+    }
+
+    public enum AttributeType
+    {
+        Health,
+        Armor,
+        Stamina,
+        Movement
+    }
+
+    public enum WeaponUpgradeType
+    {
+        Damage,
+        FireRate,
+        Magazine,
+        Reload
     }
 
     public enum WeaponType

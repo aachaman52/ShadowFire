@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using ShadowFire.Core;
 using ShadowFire.Managers;
+using ShadowFire.Player;
 
 namespace ShadowFire.UI
 {
@@ -17,6 +19,7 @@ namespace ShadowFire.UI
         public TextMeshProUGUI[] CardDescriptions;
 
         private List<UpgradeCardData> _currentCards;
+        private bool _subscribed = false;
 
         private void Awake()
         {
@@ -26,39 +29,79 @@ namespace ShadowFire.UI
 
         private void Start()
         {
+            Subscribe();
+
+            if (Container != null) Container.SetActive(false);
+
+            if (CardButtons != null)
+            {
+                for (int i = 0; i < CardButtons.Length; i++)
+                {
+                    int index = i;
+                    if (CardButtons[i] != null)
+                    {
+                        CardButtons[i].onClick.AddListener(() => OnCardClicked(index));
+                    }
+                }
+            }
+        }
+
+        private void OnEnable()
+        {
+            Subscribe();
+        }
+
+        private void Subscribe()
+        {
+            if (_subscribed) return;
+
             if (UpgradeManager.Instance != null)
             {
                 UpgradeManager.Instance.OnUpgradeChoicesGenerated += DisplayUpgradeChoices;
             }
 
-            if (Container != null) Container.SetActive(false);
-
-            for (int i = 0; i < CardButtons.Length; i++)
+            if (GameManager.Instance != null)
             {
-                int index = i;
-                if (CardButtons[i] != null)
-                {
-                    CardButtons[i].onClick.AddListener(() => OnCardClicked(index));
-                }
+                GameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
+            }
+
+            _subscribed = true;
+        }
+
+        private void HandleGameStateChanged(GameState state)
+        {
+            if (state == GameState.GameOver)
+            {
+                if (Container != null) Container.SetActive(false);
             }
         }
 
         public void DisplayUpgradeChoices(List<UpgradeCardData> choices)
         {
+            if (GameManager.Instance != null && GameManager.Instance.State == GameState.GameOver) return;
+            if (PlayerStats.Instance != null && !PlayerStats.Instance.IsAlive) return;
+
             _currentCards = choices;
             if (Container != null) Container.SetActive(true);
 
-            for (int i = 0; i < CardButtons.Length; i++)
+            if (CardButtons != null)
             {
-                if (i < choices.Count)
+                for (int i = 0; i < CardButtons.Length; i++)
                 {
-                    CardButtons[i].gameObject.SetActive(true);
-                    if (CardTitles[i] != null) CardTitles[i].text = choices[i].Title;
-                    if (CardDescriptions[i] != null) CardDescriptions[i].text = choices[i].Description;
-                }
-                else
-                {
-                    CardButtons[i].gameObject.SetActive(false);
+                    if (CardButtons[i] == null) continue;
+
+                    if (i < choices.Count)
+                    {
+                        CardButtons[i].gameObject.SetActive(true);
+                        if (CardTitles != null && i < CardTitles.Length && CardTitles[i] != null)
+                            CardTitles[i].text = choices[i].Title;
+                        if (CardDescriptions != null && i < CardDescriptions.Length && CardDescriptions[i] != null)
+                            CardDescriptions[i].text = choices[i].Description;
+                    }
+                    else
+                    {
+                        CardButtons[i].gameObject.SetActive(false);
+                    }
                 }
             }
         }

@@ -56,3 +56,9 @@ assets/Plugins/Android/assets/crashlytics-build.properties
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Logs and local reports
+*.log
+*.txt.log
+.gemini/
+*verification_report.txt

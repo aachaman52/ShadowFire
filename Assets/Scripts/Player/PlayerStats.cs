@@ -10,12 +10,12 @@ namespace ShadowFire.Player
 
         [Header("Health & Armor")]
         [SerializeField] private float maxHealth = 100f;
-        [SerializeField] private float currentHealth;
+        [SerializeField] private float currentHealth = 100f;
         [SerializeField] private float armor = 0f;
 
         [Header("Stamina")]
         [SerializeField] private float maxStamina = 100f;
-        [SerializeField] private float currentStamina;
+        [SerializeField] private float currentStamina = 100f;
         [SerializeField] private float staminaDrainRate = 25f;
         [SerializeField] private float staminaRegenRate = 20f;
         [SerializeField] private float staminaRegenDelay = 1.0f;
@@ -62,8 +62,23 @@ namespace ShadowFire.Player
             else if (Instance != this) Destroy(gameObject);
 
             _characterController = GetComponent<CharacterController>();
+            ReloadStatsFromSave();
+        }
+
+        private float _lastDamageTime;
+
+        public void ReloadStatsFromSave()
+        {
+            var data = SaveSystem.SaveSystem.Load();
+            maxHealth = 250f + (data.HealthUpgradeLevel * 35f);
+            armor = 20f + (data.ArmorUpgradeLevel * 10f);
+            maxStamina = 150f + (data.StaminaUpgradeLevel * 25f);
+            SprintMultiplier = 1.0f + (data.MovementUpgradeLevel * 0.05f);
+
             currentHealth = maxHealth;
             currentStamina = maxStamina;
+            currentLevel = data.PlayerLevel;
+            currentXp = data.CurrentXP;
             CalculateXpRequirement();
         }
 
@@ -81,9 +96,16 @@ namespace ShadowFire.Player
             {
                 if (currentStamina < maxStamina)
                 {
-                    currentStamina = Mathf.Min(maxStamina, currentStamina + staminaRegenRate * Time.deltaTime);
+                    currentStamina = Mathf.Min(maxStamina, currentStamina + 35f * Time.deltaTime);
                     OnStaminaChanged?.Invoke(currentStamina, maxStamina);
                 }
+            }
+
+            // Passive Health regeneration when out of combat
+            if (Time.time - _lastDamageTime > 4.0f && currentHealth < maxHealth && IsAlive)
+            {
+                currentHealth = Mathf.Min(maxHealth, currentHealth + 6f * Time.deltaTime);
+                OnHealthChanged?.Invoke(currentHealth, maxHealth);
             }
         }
 
@@ -102,6 +124,7 @@ namespace ShadowFire.Player
         public void TakeDamage(DamageInfo damageInfo)
         {
             if (!IsAlive) return;
+            _lastDamageTime = Time.time;
 
             // Armor damage reduction: Effective damage = Damage * 100 / (100 + armor)
             float damageReductionFactor = 100f / (100f + Mathf.Max(0, armor));
@@ -133,13 +156,17 @@ namespace ShadowFire.Player
 
         public void AddXp(float amount)
         {
+            if (!IsAlive) return;
             currentXp += amount;
             while (currentXp >= xpRequiredForNextLevel)
             {
                 currentXp -= xpRequiredForNextLevel;
                 currentLevel++;
                 CalculateXpRequirement();
-                OnLevelUp?.Invoke(currentLevel);
+                if (IsAlive)
+                {
+                    OnLevelUp?.Invoke(currentLevel);
+                }
             }
             OnXpChanged?.Invoke(currentXp, xpRequiredForNextLevel, currentLevel);
         }

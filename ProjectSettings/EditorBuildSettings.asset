@@ -4,6 +4,24 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: 5a0157975b307dc4ea563e70d88254c2
+  - enabled: 1
+    path: Assets/Scenes/HomeBase.unity
+    guid: 78005a3e88aed434aa1f001ff63061f0
+  - enabled: 1
+    path: Assets/Scenes/Level01.unity
+    guid: f1adf2e3755271e4cae49442cffea9ce
+  - enabled: 1
+    path: Assets/Scenes/Level02.unity
+    guid: ecf2ea94e9a10fd4789a3d70c0ecc31e
+  - enabled: 1
+    path: Assets/Scenes/Level03.unity
+    guid: d7bdda0187d6a4d418dcfc21fc22de75
+  - enabled: 1
+    path: Assets/Scenes/ShadowFireArena.unity
+    guid: ea131a30d57e5c6e92d948297a9888ad
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

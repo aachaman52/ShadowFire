@@ -61,22 +61,23 @@ namespace ShadowFire.Managers
 
         private void HandleLevelUp(int newLevel)
         {
+            if (PlayerStats.Instance != null && !PlayerStats.Instance.IsAlive) return;
+            if (GameManager.Instance != null && GameManager.Instance.State == GameState.GameOver) return;
+
             if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.PlayLevelUp();
             }
 
-            // Pause game and present 3 distinct choices
-            if (GameManager.Instance != null)
+            // Reward player with instant full health and stamina upon leveling up
+            if (PlayerStats.Instance != null)
             {
-                GameManager.Instance.SetState(GameState.UpgradePause);
+                PlayerStats.Instance.Heal(100f);
             }
-            Time.timeScale = 0f;
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
 
-            List<UpgradeCardData> choices = GetThreeRandomUpgrades();
-            OnUpgradeChoicesGenerated?.Invoke(choices);
+            // In progression-based missions, progression is managed at Home Base.
+            // Ensure timeScale remains 1 so gameplay never freezes!
+            Time.timeScale = 1f;
         }
 
         private List<UpgradeCardData> GetThreeRandomUpgrades()
@@ -96,6 +97,9 @@ namespace ShadowFire.Managers
 
         public void SelectUpgrade(UpgradeType type)
         {
+            if (PlayerStats.Instance != null && !PlayerStats.Instance.IsAlive) return;
+            if (GameManager.Instance != null && GameManager.Instance.State == GameState.GameOver) return;
+
             if (PlayerStats.Instance != null)
             {
                 PlayerStats.Instance.ApplyUpgrade(type);

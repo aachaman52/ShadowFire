@@ -7,6 +7,8 @@ using ShadowFire.Enemies;
 using ShadowFire.Environment;
 using ShadowFire.Audio;
 using ShadowFire.Effects;
+using ShadowFire.Missions;
+using ShadowFire.Models;
 
 namespace ShadowFire.Managers
 {
@@ -80,11 +82,11 @@ namespace ShadowFire.Managers
 
             if (isBossWave)
             {
-                totalEnemiesThisWave = 1 + (currentWave / 5) * 4; // Boss + 4 minions
+                totalEnemiesThisWave = 1 + (currentWave / 5) * 2;
             }
             else
             {
-                totalEnemiesThisWave = 8 + currentWave * 3;
+                totalEnemiesThisWave = 3 + currentWave * 2;
             }
 
             enemiesRemaining = totalEnemiesThisWave;
@@ -101,23 +103,23 @@ namespace ShadowFire.Managers
 
         private IEnumerator SpawnWaveRoutine(bool isBossWave)
         {
-            float healthMult = 1.0f + (currentWave - 1) * 0.15f;
-            float speedMult = Mathf.Min(1.6f, 1.0f + (currentWave - 1) * 0.03f);
-            float damageMult = 1.0f + (currentWave - 1) * 0.10f;
+            float healthMult = 1.0f + (currentWave - 1) * 0.10f;
+            float speedMult = Mathf.Min(1.4f, 1.0f + (currentWave - 1) * 0.02f);
+            float damageMult = 1.0f + (currentWave - 1) * 0.05f;
 
             if (isBossWave)
             {
                 // Spawn Boss at Boss Spawn Point
                 Vector3 bPos = Arena != null && Arena.BossSpawnPoint != null ? Arena.BossSpawnPoint.position : new Vector3(0, 0.5f, 25f);
                 SpawnEnemy(EnemyType.Boss, bPos, healthMult * 1.2f, speedMult, damageMult);
-                yield return new WaitForSeconds(1.5f);
+                yield return new WaitForSeconds(2.0f);
 
                 // Spawn Minion escorts
                 for (int i = 1; i < totalEnemiesThisWave; i++)
                 {
                     Vector3 sPos = GetRandomSpawnPosition();
                     SpawnEnemy(EnemyType.Runner, sPos, healthMult, speedMult, damageMult);
-                    yield return new WaitForSeconds(0.8f);
+                    yield return new WaitForSeconds(1.2f);
                 }
             }
             else
@@ -129,7 +131,7 @@ namespace ShadowFire.Managers
                     Vector3 sPos = GetRandomSpawnPosition();
                     SpawnEnemy(typeToSpawn, sPos, healthMult, speedMult, damageMult);
 
-                    float spawnDelay = Mathf.Max(0.3f, 1.4f - (currentWave * 0.05f));
+                    float spawnDelay = Mathf.Max(0.8f, 1.8f - (currentWave * 0.1f));
                     yield return new WaitForSeconds(spawnDelay);
                 }
             }
@@ -203,41 +205,53 @@ namespace ShadowFire.Managers
             {
                 case EnemyType.Zombie:
                     obj.name = "Enemy_Zombie";
-                    obj.transform.localScale = new Vector3(1f, 1.8f, 1f);
+                    obj.transform.localScale = new Vector3(0.85f, 0.95f, 0.85f);
                     mr.material = ProceduralMeshGenerator.GetMaterial("enemy");
+                    agent.radius = 0.4f;
+                    agent.height = 1.75f;
                     enemyComponent = obj.AddComponent<ZombieEnemy>();
+                    GunModelSetup.InstantiateGun(obj.transform, new Vector3(0.35f, 0.2f, 0.35f), Quaternion.identity, 0.85f);
                     break;
 
                 case EnemyType.Runner:
                     obj.name = "Enemy_Runner";
-                    obj.transform.localScale = new Vector3(0.8f, 1.4f, 0.8f);
+                    obj.transform.localScale = new Vector3(0.75f, 0.85f, 0.75f);
                     mr.material = ProceduralMeshGenerator.GetMaterial("glowred");
+                    agent.radius = 0.35f;
+                    agent.height = 1.6f;
                     enemyComponent = obj.AddComponent<RunnerEnemy>();
+                    GunModelSetup.InstantiateGun(obj.transform, new Vector3(0.32f, 0.15f, 0.32f), Quaternion.identity, 0.75f);
                     break;
 
                 case EnemyType.Tank:
                     obj.name = "Enemy_Tank";
-                    obj.transform.localScale = new Vector3(2.2f, 2.5f, 2.2f);
+                    obj.transform.localScale = new Vector3(1.15f, 1.25f, 1.15f);
                     mr.material = ProceduralMeshGenerator.GetMaterial("gunmetal");
-                    agent.radius = 1.1f;
-                    agent.height = 2.5f;
+                    agent.radius = 0.6f;
+                    agent.height = 2.1f;
                     enemyComponent = obj.AddComponent<TankEnemy>();
+                    GunModelSetup.InstantiateGun(obj.transform, new Vector3(0.55f, 0.25f, 0.5f), Quaternion.identity, 1.25f);
                     break;
 
                 case EnemyType.Shooter:
                     obj.name = "Enemy_Shooter";
-                    obj.transform.localScale = new Vector3(1.1f, 1.7f, 1.1f);
+                    obj.transform.localScale = new Vector3(0.85f, 0.95f, 0.85f);
                     mr.material = ProceduralMeshGenerator.GetMaterial("glowcyan");
+                    agent.radius = 0.4f;
+                    agent.height = 1.75f;
                     enemyComponent = obj.AddComponent<ShooterEnemy>();
+                    GunModelSetup.InstantiateGun(obj.transform, new Vector3(0.35f, 0.2f, 0.35f), Quaternion.identity, 0.95f);
                     break;
 
                 case EnemyType.Boss:
                     obj.name = "Enemy_Boss_Overlord";
-                    obj.transform.localScale = new Vector3(3.2f, 4.0f, 3.2f);
+                    obj.transform.localScale = new Vector3(1.5f, 1.75f, 1.5f);
                     mr.material = ProceduralMeshGenerator.GetMaterial("boss");
-                    agent.radius = 1.6f;
-                    agent.height = 4.0f;
+                    agent.radius = 0.8f;
+                    agent.height = 2.8f;
                     enemyComponent = obj.AddComponent<BossEnemy>();
+                    GunModelSetup.InstantiateGun(obj.transform, new Vector3(0.7f, 0.35f, 0.65f), Quaternion.identity, 1.6f);
+                    GunModelSetup.InstantiateGun(obj.transform, new Vector3(-0.7f, 0.35f, 0.65f), Quaternion.identity, 1.6f);
                     break;
             }
 
@@ -291,7 +305,14 @@ namespace ShadowFire.Managers
                 AudioManager.Instance.PlayWaveComplete();
             }
 
-            StartCoroutine(StartNextWaveWithCountdown());
+            if (LevelManager.Instance != null && currentWave >= LevelManager.Instance.TotalWavesInLevel)
+            {
+                LevelManager.Instance.CompleteLevel();
+            }
+            else
+            {
+                StartCoroutine(StartNextWaveWithCountdown());
+            }
         }
     }
 }

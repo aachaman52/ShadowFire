@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f4f81e228b59914080879757cc699b8, type: 3}
+  m_Name: Mission_01
+  m_EditorClassIdentifier: 
+  MissionID: 1
+  MissionName: Abandoned Outpost
+  Description: Infiltrate the forward defense perimeter and eradicate 3 waves of
+    hostiles.
+  SceneName: Level01
+  TotalWaves: 3
+  DifficultyMultiplier: 1
+  RequiredPlayerLevel: 1
+  RequiredPreviousMissionID: 0
+  BaseXpReward: 1000
+  CreditReward: 600
+  CompletionBonus: 250
+  HasBossFinalWave: 0
+  BossType: 4

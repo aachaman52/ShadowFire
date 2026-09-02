@@ -116,6 +116,7 @@ namespace ShadowFire.Audio
         public void PlayWaveStart() => Play2DSFX(_levelUpClip, 0.9f, 0.8f);
         public void PlayWaveComplete() => Play2DSFX(_levelUpClip, 0.9f, 1.1f);
         public void PlayEnemyDeath(Vector3 pos) => Play3DSFX(_footstepClip, pos, 0.7f, 0.7f);
+        public void PlayFleshHit(Vector3 pos) => Play3DSFX(_footstepClip, pos, 0.85f, Random.Range(0.6f, 0.8f));
         public void PlayGameOver() => Play2DSFX(_bossRoarClip, 1.0f, 0.6f);
     }
 }

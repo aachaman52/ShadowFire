@@ -112,13 +112,15 @@ namespace ShadowFire.Enemies
         {
             if (targetPlayer == null) return;
 
-            float distanceToPlayer = Vector3.Distance(transform.position, targetPlayer.position);
+            Vector3 flatEnemyPos = new Vector3(transform.position.x, 0, transform.position.z);
+            Vector3 flatPlayerPos = new Vector3(targetPlayer.position.x, 0, targetPlayer.position.z);
+            float horizontalDistance = Vector3.Distance(flatEnemyPos, flatPlayerPos);
 
             switch (currentState)
             {
                 case EnemyState.Idle:
                 case EnemyState.Patrol:
-                    if (distanceToPlayer <= aggroRange)
+                    if (horizontalDistance <= aggroRange)
                     {
                         SetState(EnemyState.Chase);
                     }
@@ -131,7 +133,7 @@ namespace ShadowFire.Enemies
                         agent.SetDestination(targetPlayer.position);
                     }
 
-                    if (distanceToPlayer <= attackRange)
+                    if (horizontalDistance <= attackRange)
                     {
                         SetState(EnemyState.Attack);
                     }
@@ -140,7 +142,11 @@ namespace ShadowFire.Enemies
                 case EnemyState.Attack:
                     if (agent.isActiveAndEnabled && agent.isOnNavMesh)
                     {
-                        agent.isStopped = true;
+                        agent.isStopped = horizontalDistance <= 1.2f;
+                        if (!agent.isStopped)
+                        {
+                            agent.SetDestination(targetPlayer.position);
+                        }
                     }
 
                     // Face player while attacking
@@ -156,7 +162,7 @@ namespace ShadowFire.Enemies
                         PerformAttack();
                     }
 
-                    if (distanceToPlayer > attackRange * 1.3f)
+                    if (horizontalDistance > attackRange * 1.6f)
                     {
                         SetState(EnemyState.Chase);
                     }
@@ -173,13 +179,34 @@ namespace ShadowFire.Enemies
                 characterAnimator.TriggerAttack(0, attackCooldown * 0.7f);
             }
 
-            if (targetPlayer != null && Vector3.Distance(transform.position, targetPlayer.position) <= attackRange * 1.3f)
+            if (targetPlayer == null && PlayerController.Instance != null)
             {
-                IDamageable playerDamageable = targetPlayer.GetComponent<IDamageable>();
-                if (playerDamageable != null && playerDamageable.IsAlive)
+                targetPlayer = PlayerController.Instance.transform;
+            }
+
+            if (targetPlayer != null)
+            {
+                Vector3 flatEnemyPos = new Vector3(transform.position.x, 0, transform.position.z);
+                Vector3 flatPlayerPos = new Vector3(targetPlayer.position.x, 0, targetPlayer.position.z);
+                float horizontalDist = Vector3.Distance(flatEnemyPos, flatPlayerPos);
+
+                if (horizontalDist <= attackRange * 1.6f)
                 {
-                    DamageInfo dInfo = new DamageInfo(attackDamage, targetPlayer.position, Vector3.up, false, gameObject, transform.forward * 5f, HitType.Melee);
-                    playerDamageable.TakeDamage(dInfo);
+                    IDamageable playerDamageable = targetPlayer.GetComponent<IDamageable>() ?? (IDamageable)PlayerStats.Instance;
+                    if (playerDamageable != null && playerDamageable.IsAlive)
+                    {
+                        DamageInfo dInfo = new DamageInfo(attackDamage, targetPlayer.position, Vector3.up, false, gameObject, transform.forward * 4f, HitType.Melee);
+                        playerDamageable.TakeDamage(dInfo);
+
+                        if (AudioManager.Instance != null)
+                        {
+                            AudioManager.Instance.PlayFleshHit(targetPlayer.position);
+                        }
+                        if (CameraShake.Instance != null)
+                        {
+                            CameraShake.Instance.AddTrauma(0.25f);
+                        }
+                    }
                 }
             }
         }

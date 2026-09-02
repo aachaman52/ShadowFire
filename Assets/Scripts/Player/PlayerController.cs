@@ -1,6 +1,7 @@
 using UnityEngine;
 using ShadowFire.Core;
 using ShadowFire.Audio;
+using ShadowFire.Managers;
 
 namespace ShadowFire.Player
 {
@@ -71,6 +72,7 @@ namespace ShadowFire.Player
         {
             if (_stats != null && !_stats.IsAlive) return;
             if (_input == null) return;
+            if (GameManager.Instance != null && GameManager.Instance.State != GameState.InGame && GameManager.Instance.State != GameState.WaveCountdown) return;
 
             HandleLook();
             HandleMovement();
